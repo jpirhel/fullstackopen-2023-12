@@ -21,19 +21,19 @@ sequenceDiagram
     browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/notes
 
     activate server
-    server -->> browser: HTML document contents
+    server -->> browser: 200 OK: HTML document contents
     deactivate server
 
     browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
 
     activate server
-    server -->> browser: CSS document contents
+    server -->> browser: 200 OK: CSS document contents
     deactivate server
 
     browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
 
     activate server
-    server -->> browser: JavaScript document contents
+    server -->> browser: 200 OK: JavaScript document contents
     deactivate server
 
     Note right of browser: Browser starts executing JavaScript
@@ -41,7 +41,7 @@ sequenceDiagram
     browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
 
     activate server
-    server -->> browser: JSON document contents
+    server -->> browser: 200 OK: JSON document contents
     deactivate server
 
     Note right of browser: Browser renders the notes from JSON data
@@ -56,6 +56,26 @@ Single Page Application sequence diagram
 sequenceDiagram
     participant browser
     participant server
+    
+    browser ->> server: GET https://studies.cs.helsinki.fi/exampleapp/spa
+    
+    activate server
+    server -->> browser: 200 OK: HTML document contents
+    deactivate server
+
+    
+
+```
+
+## Assignment 0.6
+
+Single Page Application add note sequence diagram
+
+```mermaid
+
+sequenceDiagram
+    participant browser
+    participant server
 
     browser ->> server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
 
@@ -64,16 +84,5 @@ sequenceDiagram
     deactivate server
 
     Note right of browser: The new note is now posted, the browser adds the note it created locally to the list of notes
-```
-
-## Assignment 0.6
-
-```mermaid
-
-sequenceDiagram
-    participant browser
-    participant server
-    
     
 ```
- 
