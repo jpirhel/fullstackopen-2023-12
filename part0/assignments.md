@@ -2,7 +2,7 @@
 
 ## Assignment 0.4
 
-Traditional web application sequence diagram
+Traditional web application post new note sequence diagram
 
 ```mermaid
 
@@ -63,13 +63,32 @@ sequenceDiagram
     server -->> browser: 200 OK: HTML document contents
     deactivate server
 
-    
+    browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
 
+    activate server
+    server -->> browser: 200 OK: CSS document contents
+    deactivate server
+
+    browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
+
+    activate server
+    server -->> browser: 200 OK: JavaScript document contents
+    deactivate server
+
+    Note right of browser: Browser starts executing JavaScript
+
+    browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
+
+    activate server
+    server -->> browser: 200 OK: JSON document contents
+    deactivate server
+
+    Note right of browser: Browser renders notes from JSON data
 ```
 
 ## Assignment 0.6
 
-Single Page Application add note sequence diagram
+Single Page Application post new note sequence diagram
 
 ```mermaid
 
