@@ -14,7 +14,7 @@ sequenceDiagram
     server -->> browser: 302 Redirect
     deactivate server
 
-    Note The new note is now posted, the rest is identical to accessing the notes
+    Note right of browser: The new note is now posted, the rest is identical to accessing the notes
 
     browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/notes
 
