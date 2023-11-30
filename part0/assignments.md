@@ -76,6 +76,7 @@ sequenceDiagram
     deactivate server
 
     Note right of browser: Browser starts executing JavaScript
+    Note right of browser: JavaScript fetches notes using XMLHttpRequest
 
     browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
 
