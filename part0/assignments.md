@@ -16,7 +16,8 @@ sequenceDiagram
     server -->> browser: 302 Redirect
     deactivate server
 
-    Note right of browser: The new note is now posted, the rest is identical to accessing the notes
+    Note right of browser: The new note is now posted on the server
+    Note right of browser: The rest is identical to accessing the notes
 
     browser --> server: GET https://studies.cs.helsinki.fi/exampleapp/notes
 
@@ -84,7 +85,7 @@ sequenceDiagram
     server -->> browser: 200 OK: JSON document contents
     deactivate server
 
-    Note right of browser: Browser renders notes from JSON data
+    Note right of browser: Browser renders the notes from JSON data
 ```
 
 ## Assignment 0.6
@@ -103,6 +104,6 @@ sequenceDiagram
     server -->> browser: 201 Created
     deactivate server
 
-    Note right of browser: The new note is now posted, the browser adds the note it created locally to the list of notes
-    
+    Note right of browser: The new note is now posted on the server
+    Note right of browser: The browser adds the note it created locally to the list of notes    
 ```
