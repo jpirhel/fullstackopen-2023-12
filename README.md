@@ -1,4 +1,4 @@
-Full Stack Open 2023-12
+Full Stack Open
 
 Repository for Full Stack Open course assignments.
 
