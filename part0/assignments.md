@@ -2,6 +2,8 @@
 
 ## Assignment 0.4
 
+Traditional web application sequence diagram
+
 ```mermaid
 
 sequenceDiagram
@@ -47,13 +49,21 @@ sequenceDiagram
 ```
 ## Assignment 0.5
 
+Single Page Application sequence diagram
+
 ```mermaid
 
 sequenceDiagram
     participant browser
     participant server
-    
-    
+
+    browser ->> server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+
+    activate server
+    server -->> browser: 201 Created
+    deactivate server
+
+    Note right of browser: The new note is now posted, the browser adds the note it created locally to the list of notes
 ```
 
 ## Assignment 0.6
