@@ -58,14 +58,14 @@ const App = () => {
         <div>
             <h2>Phonebook</h2>
             <Filter handler={handleOnChangeFilter} filter={filter}/>
-            <h2>add a new</h2>
+            <h3>add a new</h3>
             <AddPersonForm
                 handleSubmit={handleOnSubmit}
                 handleName={handleOnChangeName}
                 handleNumber={handleOnChangeNumber}
                 name={newName}
                 number={newNumber}/>
-            <h2>Numbers</h2>
+            <h3>Numbers</h3>
             <PhoneNumberList persons={filteredPersons}/>
         </div>
     );
