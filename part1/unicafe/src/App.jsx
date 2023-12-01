@@ -29,12 +29,14 @@ const Statistics = ({good, neutral, bad}) => {
 
     return (
         <table>
-            <StatisticsLine name="good" value={good}/>
-            <StatisticsLine name="neutral" value={neutral}/>
-            <StatisticsLine name="bad" value={bad}/>
-            <StatisticsLine name="all" value={all}/>
-            <StatisticsLine name="average" value={average}/>
-            <StatisticsLine name="positive" value={positive} suffix="%"/>
+            <tbody>
+                <StatisticsLine name="good" value={good}/>
+                <StatisticsLine name="neutral" value={neutral}/>
+                <StatisticsLine name="bad" value={bad}/>
+                <StatisticsLine name="all" value={all}/>
+                <StatisticsLine name="average" value={average}/>
+                <StatisticsLine name="positive" value={positive} suffix="%"/>
+            </tbody>
         </table>
     );
 }
