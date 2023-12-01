@@ -3,9 +3,7 @@ import { useState } from 'react'
 const Number = ({person}) => {
     const {name} = person;
 
-    return (
-        <p>{name}</p>
-    );
+    return (<>{name}<br/></>);
 }
 
 const App = () => {
