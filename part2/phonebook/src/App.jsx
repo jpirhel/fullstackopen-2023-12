@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useState} from 'react'
 
 const Number = ({person}) => {
     const {name, number} = person;
@@ -8,7 +8,7 @@ const Number = ({person}) => {
 
 const App = () => {
     const [persons, setPersons] = useState([
-        { name: 'Arto Hellas', number: '040-1234567' }
+        {name: 'Arto Hellas', number: '040-1234567'}
     ]);
 
     const [newName, setNewName] = useState('');
@@ -73,7 +73,7 @@ const App = () => {
                 </div>
             </form>
             <h2>Numbers</h2>
-            {filteredPersons.map((person) => <Number key={person.name} person={person} />)}
+            {filteredPersons.map((person) => <Number key={person.name} person={person}/>)}
         </div>
     );
 }
