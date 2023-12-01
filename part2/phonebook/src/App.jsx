@@ -34,7 +34,7 @@ const App = () => {
             <h2>Phonebook</h2>
             <form onSubmit={handleOnSubmit}>
                 <div>
-                    name: <input onChange={handleOnChange}/>
+                    name: <input onChange={handleOnChange} value={newName}/>
                 </div>
                 <div>
                     <button type="submit">add</button>
