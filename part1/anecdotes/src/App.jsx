@@ -1,5 +1,15 @@
 import { useState } from 'react'
 
+const Anecdote = ({anecdotes, selected, votes}) => {
+    const text = anecdotes[selected];
+
+    return (
+        <>
+            {text}<br/>
+            has {votes} votes<br/>
+        </>
+    )
+}
 const App = () => {
     const anecdotes = [
         'If it hurts, do it more often.',
@@ -32,27 +42,37 @@ const App = () => {
         const nextVotes = {...votes};
         nextVotes[selected] = currentVotesForSelected + 1;
 
-        console.log("nextVotes:", nextVotes);
-
         setVotes(nextVotes);
     }
     const handleOnClickNextAnecdote = () => {
         const nextAnecdoteIndex = randomAnecdoteIndex();
-        console.log("next anecdote index:", nextAnecdoteIndex);
 
         setSelected(nextAnecdoteIndex);
     }
 
     const currentVotes = votes[selected] || 0;
-    console.log("current votes for anecdote:", currentVotes);
+
+    // NOTE probably not the best way to implement this
+
+    let mostVotesIndex = 0;
+    let mostVotesValue = 0;
+
+    for (const [key, value] of Object.entries(votes)) {
+        if (value > mostVotesValue) {
+            mostVotesValue = value;
+            mostVotesIndex = key;
+        }
+    }
 
     return (
-        <div>
-            {anecdotes[selected]}<br/>
-            has {currentVotes} votes<br/>
+        <>
+            <h1>Anecdote of the day</h1>
+            <Anecdote anecdotes={anecdotes} selected={selected} votes={currentVotes}/>
             <button onClick={handleOnClickVote}>vote</button>
             <button onClick={handleOnClickNextAnecdote}>next anecdote</button>
-        </div>
+            <h1>Anecdote with the most votes</h1>
+            <Anecdote anecdotes={anecdotes} selected={mostVotesIndex} votes={mostVotesValue}/>
+        </>
     )
 }
 
