@@ -1,19 +1,37 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
+
+import axios from "axios";
 
 import Filter from "./components/Filter.jsx";
 import PhoneNumberList from "./components/PhoneNumberList.jsx";
 import AddPersonForm from "./components/AddPersonForm.jsx";
 
 const App = () => {
-    const [persons, setPersons] = useState([
-        {name: 'Arto Hellas', number: '040-1234567'}
-    ]);
+    const [persons, setPersons] = useState([]);
 
     const [newName, setNewName] = useState('');
 
     const [newNumber, setNewNumber] = useState('');
 
     const [filter, setFilter] = useState('');
+
+    const fetchInitialData = () => {
+        const dataUrl = "http://localhost:3001/persons";
+
+        axios
+            .get(dataUrl)
+            .then(response => {
+                setPersons(response.data);
+            });
+    }
+
+    // NOTE:
+    // This could lead to a race condition. The fetched "initial" state is not really initial;
+    // the 'persons' state variable is initialised to [] and later overwritten by the data
+    // fetched by the effect. What if the user manages to change the persons state variable
+    // before the data fetching finishes running? The changes would be lost.
+
+    useEffect(fetchInitialData, []);
 
     const handleOnSubmit = (event) => {
         event.preventDefault();
