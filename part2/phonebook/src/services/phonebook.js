@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const serverUrl = "http://localhost:3001/persons";
+const serverUrl = "http://localhost:3001/api/persons";
 
 export const fetchInitialData = () => {
     return axios.get(serverUrl)
