@@ -15,8 +15,11 @@ const App = () => {
 
     const [filter, setFilter] = useState('');
 
+    const serverUrl = "http://localhost:3001/persons";
+
     const fetchInitialData = () => {
-        const dataUrl = "http://localhost:3001/persons";
+        // noinspection UnnecessaryLocalVariableJS
+        const dataUrl = serverUrl;
 
         axios
             .get(dataUrl)
@@ -43,11 +46,21 @@ const App = () => {
             return;
         }
 
+        const submitUrl = `${serverUrl}`
+
         const newPerson = {name: newName, number: newNumber};
 
-        const newPersons = persons.concat(newPerson);
+        // save new person to the server
 
-        setPersons(newPersons);
+        axios.post(submitUrl, newPerson).then(response => {
+            // update persons stored in state
+
+            const serverStoredPerson = response.data;
+
+            const newPersons = persons.concat(serverStoredPerson);
+
+            setPersons(newPersons);
+        })
     };
 
     const handleOnChangeName = (event) => {
