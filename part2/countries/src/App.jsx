@@ -63,7 +63,7 @@ function App() {
                     ? <NumMatchesInfo countries={filteredCountries}/>
                     : filteredCountries.map((country) =>
                         <CountryListItem
-                            key={country.name.official}
+                            key={`country-list-${country.name.official}`}
                             country={country}/>)}
                 {filteredCountries.length === 1 && <CountryInfo key="list-country-info" country={filteredCountries[0]}/>}
             </div>

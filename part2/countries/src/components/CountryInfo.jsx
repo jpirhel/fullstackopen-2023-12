@@ -1,3 +1,5 @@
+import Weather from './Weather.jsx';
+
 const CountryInfo = ({country}) => {
     console.log("CountryInfo, country:", country);
 
@@ -10,9 +12,10 @@ const CountryInfo = ({country}) => {
             area {country.area} <br/>
             <h3>languages:</h3>
             <ul>
-                {languages.map((l) => <li>{l}</li>)}
+                {languages.map((l) => <li key={l}>{l}</li>)}
             </ul>
             <img src={country.flags.png} alt={country.flags.alt} width={150}/>
+            <Weather key={`weather-${country.name.common}`} country={country}/>
         </div>
     );
 }
