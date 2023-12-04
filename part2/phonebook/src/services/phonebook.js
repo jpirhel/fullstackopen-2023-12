@@ -9,3 +9,8 @@ export const fetchInitialData = () => {
 export const postNewPerson = (newPerson) => {
     return axios.post(serverUrl, newPerson);
 }
+
+export const deletePerson = (personId) => {
+    const deleteUrl = `${serverUrl}/${personId}`;
+    return axios.delete(deleteUrl)
+}

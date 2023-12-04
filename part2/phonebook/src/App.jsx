@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 
-import {fetchInitialData, postNewPerson} from './services/phonebook.js';
+import {deletePerson, fetchInitialData, postNewPerson} from './services/phonebook.js';
 
 import axios from "axios";
 
@@ -66,6 +66,22 @@ const App = () => {
         setFilter(value);
     }
 
+    const handleDeletePerson = (person) => {
+        deletePerson(person.id);
+
+        const newPersons = persons.filter((p) => p.id !== person.id);
+
+        setPersons(newPersons);
+    }
+
+    const handleOnDeletePerson = (person) => {
+        const message = `Delete ${person.name}?`;
+
+        if (window.confirm(message)) {
+            handleDeletePerson(person);
+        }
+    }
+
     const filteredPersons = filter !== ''
         ? persons.filter(
             (person) => person.name
@@ -85,7 +101,9 @@ const App = () => {
                 name={newName}
                 number={newNumber}/>
             <h3>Numbers</h3>
-            <PhoneNumberList persons={filteredPersons}/>
+            <PhoneNumberList
+                persons={filteredPersons}
+                deleteHandler={handleOnDeletePerson}/>
         </div>
     );
 }
