@@ -6,7 +6,7 @@ const CountryInfo = ({country}) => {
     const languages = Object.values(country.languages);
 
     return (
-        <div>
+        <div className="countryInfo">
             <h1>{country.name.common}</h1>
             capital {country.capital} <br/>
             area {country.area} <br/>
