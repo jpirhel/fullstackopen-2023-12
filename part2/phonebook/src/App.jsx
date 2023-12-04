@@ -100,9 +100,24 @@ const App = () => {
     }
 
     const handleDeletePerson = (person) => {
-        deletePerson(person.id);
-        const newPersons = persons.filter((p) => p.id !== person.id);
-        setPersons(newPersons);
+        const handled = deletePerson(person.id);
+
+        handled
+            .then(() => {
+                const newPersons = persons.filter((p) => p.id !== person.id);
+                setPersons(newPersons);
+            })
+            .catch(() => {
+                const message = `Information of ${person.name} has already been removed from server`
+                displayNotification(message, "error");
+
+                // FIXME duplicated code
+
+                // remove deleted person from local state
+
+                const newPersons = persons.filter(p => p.id !== person.id);
+                setPersons(newPersons);
+            });
     }
 
     const handleOnDeletePerson = (person) => {
@@ -122,11 +137,26 @@ const App = () => {
 
             const handled = changePerson(newPerson);
 
-            handled.then(() => {
-                const newPersons = persons.map(p => p.id !== person.id ? p : newPerson);
-                setPersons(newPersons);
-                displayNotification(`Changed the number for ${newPerson.name}`);
-            });
+            handled
+                .then(() => {
+                    // add changed person to local state
+                    const newPersons = persons.map(p => p.id !== person.id ? p : newPerson);
+                    setPersons(newPersons);
+
+                    const message = `Changed the number for ${newPerson.name}`;
+                    displayNotification(message);
+                })
+                .catch(() => {
+                    const message = `Information of ${person.name} has already been removed from server`;
+                    displayNotification(message, "error");
+
+                    // FIXME duplicated code
+
+                    // remove deleted person from local state
+
+                    const newPersons = persons.filter(p => p.id !== person.id);
+                    setPersons(newPersons);
+                });
         }
     }
 
