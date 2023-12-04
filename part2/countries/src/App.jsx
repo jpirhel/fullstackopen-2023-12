@@ -65,7 +65,7 @@ function App() {
                         <CountryListItem
                             key={country.name.official}
                             country={country}/>)}
-                {filteredCountries.length === 1 && <CountryInfo country={filteredCountries[0]}/>}
+                {filteredCountries.length === 1 && <CountryInfo key="list-country-info" country={filteredCountries[0]}/>}
             </div>
         </div>
     );
