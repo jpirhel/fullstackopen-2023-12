@@ -15,7 +15,7 @@ export const deletePerson = (personId) => {
     return axios.delete(deleteUrl)
 }
 
-export const handleChangePerson = (person) => {
+export const changePerson = (person) => {
     const changeUrl = `${serverUrl}/${person.id}`;
     return axios.put(changeUrl, person);
 }

@@ -3,11 +3,12 @@ import {useEffect, useState} from 'react'
 import {
     deletePerson,
     fetchInitialData,
-    handleChangePerson,
+    changePerson,
     postNewPerson,
 } from './services/phonebook.js';
 
 import Filter from "./components/Filter.jsx";
+import Notification from "./components/Notification.jsx";
 import PhoneNumberList from "./components/PhoneNumberList.jsx";
 import AddPersonForm from "./components/AddPersonForm.jsx";
 
@@ -20,6 +21,9 @@ const App = () => {
 
     const [filter, setFilter] = useState('');
 
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+
     const initialDataFetcher = () => {
         const fetched = fetchInitialData();
 
@@ -29,6 +33,29 @@ const App = () => {
     }
 
     useEffect(initialDataFetcher, []);
+
+    const displayNotification = (message, notificationType) => {
+        const timeout = 5000; // milliseconds
+
+        switch (notificationType) {
+            case "error":
+                setErrorMessage(message);
+
+                setTimeout(() => {
+                    setErrorMessage("");
+                }, timeout);
+                break;
+            case "success":
+                // fall through
+            default:
+                setSuccessMessage(message);
+
+                setTimeout(() => {
+                    setSuccessMessage("");
+                }, timeout);
+                break;
+        }
+    }
 
     const handleOnSubmit = (event) => {
         event.preventDefault();
@@ -49,6 +76,8 @@ const App = () => {
             const serverStoredPerson = response.data;
             const newPersons = persons.concat(serverStoredPerson);
             setPersons(newPersons);
+
+            displayNotification(`Added ${serverStoredPerson.name}`);
         };
 
         const posted = postNewPerson(newPerson);
@@ -91,11 +120,12 @@ const App = () => {
             const newPerson = {...person};
             newPerson.number = newNumber;
 
-            const handled = handleChangePerson(newPerson);
+            const handled = changePerson(newPerson);
 
             handled.then(() => {
                 const newPersons = persons.map(p => p.id !== person.id ? p : newPerson);
                 setPersons(newPersons);
+                displayNotification(`Changed the number for ${newPerson.name}`);
             });
         }
     }
@@ -110,6 +140,8 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={errorMessage} notificationType="error"/>
+            <Notification message={successMessage} notificationType="success"/>
             <Filter handler={handleOnChangeFilter} filter={filter}/>
             <h3>add a new</h3>
             <AddPersonForm
