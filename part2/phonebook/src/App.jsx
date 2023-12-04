@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react'
 
+import {fetchInitialData, postNewPerson} from './services/phonebook.js';
+
 import axios from "axios";
 
 import Filter from "./components/Filter.jsx";
@@ -15,26 +17,15 @@ const App = () => {
 
     const [filter, setFilter] = useState('');
 
-    const serverUrl = "http://localhost:3001/persons";
+    const initialDataFetcher = () => {
+        const fetched = fetchInitialData();
 
-    const fetchInitialData = () => {
-        // noinspection UnnecessaryLocalVariableJS
-        const dataUrl = serverUrl;
-
-        axios
-            .get(dataUrl)
-            .then(response => {
-                setPersons(response.data);
-            });
+        fetched.then((response) => {
+            setPersons(response.data);
+        });
     }
 
-    // NOTE:
-    // This could lead to a race condition. The fetched "initial" state is not really initial;
-    // the 'persons' state variable is initialised to [] and later overwritten by the data
-    // fetched by the effect. What if the user manages to change the persons state variable
-    // before the data fetching finishes running? The changes would be lost.
-
-    useEffect(fetchInitialData, []);
+    useEffect(initialDataFetcher, []);
 
     const handleOnSubmit = (event) => {
         event.preventDefault();
@@ -46,21 +37,18 @@ const App = () => {
             return;
         }
 
-        const submitUrl = `${serverUrl}`
-
         const newPerson = {name: newName, number: newNumber};
 
         // save new person to the server
 
-        axios.post(submitUrl, newPerson).then(response => {
-            // update persons stored in state
-
+        const newPersonPosted = (response) => {
             const serverStoredPerson = response.data;
-
             const newPersons = persons.concat(serverStoredPerson);
-
             setPersons(newPersons);
-        })
+        };
+
+        const posted = postNewPerson(newPerson);
+        posted.then(newPersonPosted);
     };
 
     const handleOnChangeName = (event) => {
