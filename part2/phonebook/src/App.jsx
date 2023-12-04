@@ -94,8 +94,8 @@ const App = () => {
             const handled = handleChangePerson(newPerson);
 
             handled.then(() => {
-                const newPersons = persons.filter(p => p.id !== person.id);
-                setPersons(newPersons.concat(newPerson));
+                const newPersons = persons.map(p => p.id !== person.id ? p : newPerson);
+                setPersons(newPersons);
             });
         }
     }
