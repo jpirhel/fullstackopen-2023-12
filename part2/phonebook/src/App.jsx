@@ -1,8 +1,11 @@
 import {useEffect, useState} from 'react'
 
-import {deletePerson, fetchInitialData, postNewPerson} from './services/phonebook.js';
-
-import axios from "axios";
+import {
+    deletePerson,
+    fetchInitialData,
+    handleChangePerson,
+    postNewPerson,
+} from './services/phonebook.js';
 
 import Filter from "./components/Filter.jsx";
 import PhoneNumberList from "./components/PhoneNumberList.jsx";
@@ -30,10 +33,11 @@ const App = () => {
     const handleOnSubmit = (event) => {
         event.preventDefault();
 
-        const alreadyPresent = persons.find((elem) => elem.name === newName) != null;
+        const foundPerson = persons.find((elem) => elem.name === newName);
+        const alreadyPresent = foundPerson != null;
 
         if (alreadyPresent) {
-            alert(`${newName} is already added to phonebook`);
+            handleOnChangePersonNumber(foundPerson);
             return;
         }
 
@@ -68,9 +72,7 @@ const App = () => {
 
     const handleDeletePerson = (person) => {
         deletePerson(person.id);
-
         const newPersons = persons.filter((p) => p.id !== person.id);
-
         setPersons(newPersons);
     }
 
@@ -79,6 +81,22 @@ const App = () => {
 
         if (window.confirm(message)) {
             handleDeletePerson(person);
+        }
+    }
+
+    const handleOnChangePersonNumber = (person) => {
+        const message = `${newName} is already added to the phonebook, replace the old number with a new one?`;
+
+        if (window.confirm(message)) {
+            const newPerson = {...person};
+            newPerson.number = newNumber;
+
+            const handled = handleChangePerson(newPerson);
+
+            handled.then(() => {
+                const newPersons = persons.filter(p => p.id !== person.id);
+                setPersons(newPersons.concat(newPerson));
+            });
         }
     }
 
