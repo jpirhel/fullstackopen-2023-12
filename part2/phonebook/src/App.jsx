@@ -81,7 +81,17 @@ const App = () => {
         };
 
         const posted = postNewPerson(newPerson);
-        posted.then(newPersonPosted);
+        posted
+            .then(newPersonPosted)
+            .catch(error => {
+                console.log("postNewPerson error:", error);
+                try {
+                    const message = error.response.data.message;
+                    displayNotification(message, "error");
+                } catch (error) {
+                    // nothing
+                }
+            });
     };
 
     const handleOnChangeName = (event) => {
