@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const dummy = (blogs) => {
     return 1;
 }
@@ -46,8 +48,40 @@ const favoriteBlog = (blogs) => {
     };
 }
 
+const mostBlogs = (blogs) => {
+    if (!Array.isArray(blogs)) {
+        return null;
+    }
+
+    if (blogs.length < 1) {
+        return null;
+    }
+
+    const counted = _.countBy(blogs, (blog) => blog.author);
+
+    // NOTE could probably be also implemented using a lodash function
+
+    let mostBlogsAuthor = null;
+    let mostBlogsCount = 0;
+
+    _.forEach(counted, (v, k) => {
+        // console.log(`ZZZ v: ${v}, k: ${k}`);
+
+        if (v > mostBlogsCount) {
+            mostBlogsCount = v;
+            mostBlogsAuthor = k;
+        }
+    });
+
+    return {
+        author: mostBlogsAuthor,
+        blogs: mostBlogsCount,
+    };
+}
+
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
+    mostBlogs,
 }
