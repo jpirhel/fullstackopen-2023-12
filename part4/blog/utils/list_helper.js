@@ -20,7 +20,34 @@ const totalLikes = (blogs) => {
     return likes;
 }
 
+const favoriteBlog = (blogs) => {
+    if (!Array.isArray(blogs)) {
+        return null;
+    }
+
+    if (blogs.length < 1) {
+        return null;
+    }
+
+    let maxLikes = 0;
+    let favoriteBlog = null;
+
+    blogs.forEach(blog => {
+        if (blog.likes > maxLikes) {
+            maxLikes = blog.likes;
+            favoriteBlog = blog;
+        }
+    });
+
+    return {
+        title: favoriteBlog.title,
+        author: favoriteBlog.author,
+        likes: favoriteBlog.likes,
+    };
+}
+
 module.exports = {
     dummy,
     totalLikes,
+    favoriteBlog,
 }
