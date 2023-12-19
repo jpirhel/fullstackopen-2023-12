@@ -79,9 +79,49 @@ const mostBlogs = (blogs) => {
     };
 }
 
+const mostLikes = (blogs) => {
+    if (!Array.isArray(blogs)) {
+        return null;
+    }
+
+    if (blogs.length < 1) {
+        return null;
+    }
+
+    const map = new Map();
+
+    blogs.forEach((blog) => {
+        const {author, likes} = blog;
+
+        if (! map.has(author)) {
+            map.set(author, 0);
+        }
+
+        let sumLikes = map.get(author);
+        sumLikes += likes;
+        map.set(author, sumLikes);
+    });
+
+    let authorWithMostLikes = null;
+    let likes = 0;
+
+    map.forEach((v, k) => {
+        if (v > likes) {
+            likes = v;
+            authorWithMostLikes = k;
+        }
+    });
+
+    return {
+        author: authorWithMostLikes,
+        likes,
+    };
+}
+
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
     mostBlogs,
+    mostLikes,
 }

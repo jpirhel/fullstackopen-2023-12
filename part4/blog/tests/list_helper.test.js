@@ -83,11 +83,6 @@ describe('total likes copied from source material', () => {
 });
 
 describe('total likes', () => {
-    test('the number of likes should be the sum of the likes in the blog posts', () => {
-        const result = listHelper.totalLikes(sourceMaterialBlogs);
-        expect(result).toBe(36);
-    });
-
     test('the number of likes for null variable should be 0', () => {
         const result = listHelper.totalLikes(null);
         expect(result).toBe(0);
@@ -102,6 +97,11 @@ describe('total likes', () => {
         const result = listHelper.totalLikes([]);
         expect(result).toBe(0);
     });
+
+    test('the number of likes should be the sum of the likes in the blog posts', () => {
+        const result = listHelper.totalLikes(sourceMaterialBlogs);
+        expect(result).toBe(36);
+    });
 });
 
 describe('favorite blog', () => {
@@ -112,6 +112,11 @@ describe('favorite blog', () => {
 
     test('favorite blog for string variable should be null', () => {
         const result = listHelper.favoriteBlog("some string");
+        expect(result).toBe(null);
+    });
+
+    test('favorite blog for empty array should be null', () => {
+        const result = listHelper.favoriteBlog([]);
         expect(result).toBe(null);
     });
 
@@ -139,6 +144,11 @@ describe('most blogs for an author', () => {
         expect(result).toBe(null);
     });
 
+    test('most blogs for empty array should be null', () => {
+        const result = listHelper.mostBlogs([]);
+        expect(result).toBe(null);
+    });
+
     test('most blogs for blogs variable should be the author with the most blogs', () => {
         const correct = {
             author: "Robert C. Martin",
@@ -147,6 +157,33 @@ describe('most blogs for an author', () => {
 
         const result = listHelper.mostBlogs(sourceMaterialBlogs);
 
+        expect(result).toEqual(correct);
+    });
+});
+
+describe('most likes for an author', () => {
+    test('most likes for null variable should be null', () => {
+        const result = listHelper.mostLikes(null);
+        expect(result).toBe(null);
+    });
+
+    test('most likes for string variable should be null', () => {
+        const result = listHelper.mostLikes("some string");
+        expect(result).toBe(null);
+    });
+
+    test('most likes for empty array should be null', () => {
+        const result = listHelper.mostLikes([]);
+        expect(result).toBe(null);
+    });
+
+    test('most likes for blogs should be the author with the most likes', () => {
+        const correct = {
+            author: "Edsger W. Dijkstra",
+            likes: 17,
+        };
+
+        const result = listHelper.mostLikes(sourceMaterialBlogs);
         expect(result).toEqual(correct);
     });
 });
