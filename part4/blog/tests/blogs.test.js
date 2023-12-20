@@ -121,6 +121,25 @@ describe('blogs', () => {
 
        expect(numBlogs).toBe(1);
    });
+
+   test('missing likes property defaults to 0', async () => {
+       await Blog.deleteMany({});
+
+       const blogToBePostedData = sourceMaterialBlogs[0];
+
+       delete blogToBePostedData.likes;
+
+       const result = await api
+           .post("/api/blogs")
+           .send(blogToBePostedData)
+           .expect(201)
+           .expect("Content-Type", /application\/json/);
+
+       const postedBlog = result.body;
+
+       expect(postedBlog.id).toBeDefined();
+       expect(postedBlog.likes).toBe(0);
+   });
 });
 
 afterAll(async () => {
