@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 
@@ -10,9 +12,15 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
     const blog = new Blog(request.body)
 
-    const result = await blog.save();
+    const title = _.get(blog, "title");
+    const url = _.get(blog, "url");
 
-    response.status(201).json(result);
+    if (_.isEmpty(title) || _.isEmpty(url)) {
+        response.status(400).end();
+    } else {
+        const result = await blog.save();
+        response.status(201).json(result);
+    }
 });
 
 module.exports = blogsRouter;

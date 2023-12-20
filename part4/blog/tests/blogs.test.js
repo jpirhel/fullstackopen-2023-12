@@ -140,6 +140,40 @@ describe('blogs', () => {
        expect(postedBlog.id).toBeDefined();
        expect(postedBlog.likes).toBe(0);
    });
+
+    test('posting an incomplete blog data returns correct error code', async () => {
+        await Blog.deleteMany({});
+
+        const blogToBePostedData = sourceMaterialBlogs[0];
+
+        const incompleteBlog1 = Object.assign({}, blogToBePostedData);
+        delete incompleteBlog1.title;
+
+        // noinspection JSUnusedLocalSymbols
+        const result1 = await api
+            .post("/api/blogs")
+            .send(incompleteBlog1)
+            .expect(400);
+
+        const incompleteBlog2 = Object.assign({}, blogToBePostedData);
+        delete incompleteBlog2.url;
+
+        // noinspection JSUnusedLocalSymbols
+        const result2 = await api
+            .post("/api/blogs")
+            .send(incompleteBlog2)
+            .expect(400);
+
+        const numResult = await api
+            .get("/api/blogs")
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = numResult.body;
+        const numBlogs = blogs.length;
+
+        expect(numBlogs).toBe(0);
+    });
 });
 
 afterAll(async () => {
