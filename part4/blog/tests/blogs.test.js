@@ -94,6 +94,33 @@ describe('blogs', () => {
 
        expect(firstBlog.id).toBeDefined()
    });
+
+   test('posting a new blog works', async () => {
+       await Blog.deleteMany({});
+
+       const blogToBePostedData = sourceMaterialBlogs[0];
+
+       const result = await api
+           .post("/api/blogs")
+           .send(blogToBePostedData)
+           .expect(201)
+           .expect("Content-Type", /application\/json/);
+
+       const postedBlog = result.body;
+
+       expect(postedBlog.id).toBeDefined();
+       expect(postedBlog.likes).toBe(7);
+
+       const numResult = await api
+           .get("/api/blogs")
+           .expect(200)
+           .expect('Content-Type', /application\/json/)
+
+       const blogs = numResult.body;
+       const numBlogs = blogs.length;
+
+       expect(numBlogs).toBe(1);
+   });
 });
 
 afterAll(async () => {
