@@ -82,6 +82,18 @@ describe('blogs', () => {
 
        expect(numBlogs).toBe(6);
    });
+
+   test('a blog post contains the property id', async () => {
+       const result = await api
+           .get("/api/blogs")
+           .expect(200)
+           .expect('Content-Type', /application\/json/);
+
+       const blogs = result.body;
+       const firstBlog = blogs[0];
+
+       expect(firstBlog.id).toBeDefined()
+   });
 });
 
 afterAll(async () => {
