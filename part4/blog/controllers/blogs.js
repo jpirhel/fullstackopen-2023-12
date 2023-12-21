@@ -26,6 +26,7 @@ blogsRouter.post('/', async (request, response) => {
 blogsRouter.delete('/:id', async (request, response) => {
     const id = request.params.id;
     await Blog.findByIdAndDelete(id);
+    return response.status(200).end();
 });
 
 blogsRouter.put('/:id', async (request, response) => {
