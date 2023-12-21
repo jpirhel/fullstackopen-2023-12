@@ -251,15 +251,19 @@ describe('blogs', () => {
     test('updating a single blog succeeds when ID is found', async () => {
         const existingId = "5a422a851b54a676234d17f7";
 
-        const updatedTitle ="React patterns UPDATED";
+        const updatedTitle = "React patterns UPDATED";
+        const updatedLikes = 100;
+
         const result = await api
             .put(`/api/blogs/${existingId}`)
-            .send({title: updatedTitle})
+            .send({title: updatedTitle, likes: updatedLikes})
             .expect(200);
 
         const updatedBlog = result.body;
 
         expect(updatedBlog.title).toEqual(updatedTitle)
+
+        expect(updatedBlog.likes).toEqual(updatedLikes)
     });
 });
 
