@@ -27,7 +27,6 @@ blogsRouter.post('/', async (request, response) => {
 
     const blog = new Blog(blogData)
 
-
     const result = await blog.save();
 
     user.blogs = user.blogs.concat(blog.id);
