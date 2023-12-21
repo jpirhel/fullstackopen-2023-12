@@ -174,6 +174,51 @@ describe('blogs', () => {
 
         expect(numBlogs).toBe(0);
     });
+
+    test('deleting a single blog post fails, when ID is malformed', async () => {
+        const malformedId = "id123";
+
+        // noinspection JSUnusedLocalSymbols
+        const result = await api
+            .delete(`/api/blogs/${malformedId}`)
+            .expect(400);
+    });
+
+    test('deleting a single blog succeeds when ID is not found', async () => {
+        const existingId = "5a422a851b54a676234d17f0";
+
+        const result = await api
+            .delete(`/api/blogs/${existingId}`)
+            .expect(200);
+
+        const numResult = await api
+            .get("/api/blogs")
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = numResult.body;
+        const numBlogs = blogs.length;
+
+        expect(numBlogs).toBe(sourceMaterialBlogs.length);
+    });
+
+    test('deleting a single blog succeeds when ID is found', async () => {
+        const existingId = "5a422a851b54a676234d17f7";
+
+        const result = await api
+            .delete(`/api/blogs/${existingId}`)
+            .expect(200);
+
+        const numResult = await api
+            .get("/api/blogs")
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = numResult.body;
+        const numBlogs = blogs.length;
+
+        expect(numBlogs).toBe(sourceMaterialBlogs.length - 1);
+    });
 });
 
 afterAll(async () => {
