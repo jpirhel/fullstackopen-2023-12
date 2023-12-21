@@ -88,7 +88,7 @@ describe('when the database contains a single user', () => {
             username: "root2",
             name: "Root User 2",
             password: passwordHash,
-        }
+        };
 
         // noinspection JSUnusedLocalSymbols
         const result = await api
