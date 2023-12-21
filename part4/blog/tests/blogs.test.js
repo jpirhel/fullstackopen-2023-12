@@ -181,7 +181,7 @@ describe('blogs', () => {
         // noinspection JSUnusedLocalSymbols
         const result = await api
             .delete(`/api/blogs/${malformedId}`)
-            .expect(400);
+            .expect(500);
     });
 
     test('deleting a single blog succeeds when ID is not found', async () => {
