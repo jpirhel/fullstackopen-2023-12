@@ -223,6 +223,7 @@ describe('blogs', () => {
     test('deleting a single blog succeeds when ID is found', async () => {
         const existingId = "5a422a851b54a676234d17f7";
 
+        // noinspection JSUnusedLocalSymbols
         const result = await api
             .delete(`/api/blogs/${existingId}`)
             .expect(200);
