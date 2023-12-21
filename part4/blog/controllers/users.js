@@ -19,6 +19,23 @@ usersRouter.post("/", async (request, response) => {
         return response.status(400).end();
     }
 
+    // check validity of username & password
+
+    let valid = true;
+
+    if (username === null || `${username}`.length < 3) {
+        valid = false;
+    }
+
+    if (password === null || `${password}`.length < 3) {
+        valid = false;
+    }
+
+    if (! valid) {
+        const error = "Username and password must be at least three characters long";
+        return response.status(400).send({error});
+    }
+
     const saltRounds = 10;
 
     const passwordHash = await bcrypt.hash(password, saltRounds);
