@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const User = require("../models/user");
 const supertest = require("supertest");
 const bcrypt = require("bcryptjs");
@@ -59,6 +61,19 @@ describe('when the database contains a single user', () => {
             .send(data)
             .expect(400);
 
+        // check error message
+
+        const error = _.get(result, "body.error");
+
+        expect(error).toBeDefined();
+
+        const matcher = /.*unique.*/;
+        const matched = matcher.test(error);
+
+        expect(matched).toBe(true);
+
+        // check that number of users has not increased
+
         const users = await getUsers();
 
         expect(users).toHaveLength(1);
@@ -80,6 +95,8 @@ describe('when the database contains a single user', () => {
             .post("/api/users")
             .send(data)
             .expect(200);
+
+        // check that number of users has increased by one
 
         const users = await getUsers();
 
