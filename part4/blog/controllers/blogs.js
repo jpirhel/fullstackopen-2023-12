@@ -13,23 +13,8 @@ blogsRouter.get('/', async (request, response) => {
 });
 
 blogsRouter.post('/', async (request, response) => {
-    const blogData = request.body;
-
-    const token = request.token;
-
-    let decodedToken;
-
-    try {
-        decodedToken = jwt.verify(token, process.env.SECRET);
-    } catch (e) {
-        return response.status(401).end();
-    }
-
-    const id = _.get(decodedToken, "id");
-
-    if (_.isEmpty(id)) {
-        return response.status(401).end();
-    }
+    const userData = request.user;
+    const id = _.get(userData, "id");
 
     const user = await User.findById(id);
 
@@ -58,19 +43,7 @@ blogsRouter.post('/', async (request, response) => {
 });
 
 blogsRouter.delete('/:id', async (request, response) => {
-    const token = request.token;
-
-    if (_.isEmpty(token)) {
-        return response.status(401).send({error: "login required"});
-    }
-
-    let userData;
-
-    try {
-        userData = jwt.decode(token, process.env.SECRET);
-    } catch (e) {
-        return response.status(401).send({error: "login required"});
-    }
+    const userData = request.user;
 
     const userId = _.get(userData, "id");
 
