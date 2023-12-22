@@ -4,11 +4,11 @@ const tokenExtractor = (req, res, next) => {
 
     let addToken = true;
 
+    const prefix = "Bearer ";
+
     if (_.isEmpty(header) || !header.startsWith(prefix)) {
         addToken = false;
     }
-
-    const prefix = "Bearer ";
 
     if (addToken) {
         // noinspection UnnecessaryLocalVariableJS
