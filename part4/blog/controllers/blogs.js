@@ -4,6 +4,24 @@ const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
 
+const jwt = require("jsonwebtoken");
+
+const getTokenFromRequest = (request) => {
+    const authorizationHeader = request.get("authorization");
+
+    if (_.isEmpty(authorizationHeader)) {
+        return null;
+    }
+
+    const prefix = "Bearer ";
+
+    if (! authorizationHeader.startsWith(prefix)) {
+        return null;
+    }
+
+    return authorizationHeader.replace(prefix, "");
+}
+
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate("user");
 
@@ -13,15 +31,34 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
     const blogData = request.body;
 
+    const token = getTokenFromRequest(request);
+
+    let decodedToken;
+
+    try {
+        decodedToken = jwt.verify(token, process.env.SECRET);
+    } catch (e) {
+        return response.status(400).end();
+    }
+
+    const id = _.get(decodedToken, "id");
+
+    if (_.isEmpty(id)) {
+        return response.status(400).end();
+    }
+
+    const user = await User.findById(id);
+
+    if (_.isEmpty(user)) {
+        return response.status(400).end();
+    }
+
     const title = _.get(blogData, "title");
     const url = _.get(blogData, "url");
 
     if (_.isEmpty(title) || _.isEmpty(url)) {
         return response.status(400).end();
     }
-
-    const users = await User.find({});
-    const user = users[0];
 
     blogData.user = user.id.toString();
 
