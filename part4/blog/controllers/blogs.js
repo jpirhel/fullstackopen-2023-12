@@ -22,19 +22,19 @@ blogsRouter.post('/', async (request, response) => {
     try {
         decodedToken = jwt.verify(token, process.env.SECRET);
     } catch (e) {
-        return response.status(400).end();
+        return response.status(401).end();
     }
 
     const id = _.get(decodedToken, "id");
 
     if (_.isEmpty(id)) {
-        return response.status(400).end();
+        return response.status(401).end();
     }
 
     const user = await User.findById(id);
 
     if (_.isEmpty(user)) {
-        return response.status(400).end();
+        return response.status(401).end();
     }
 
     const title = _.get(blogData, "title");
@@ -61,7 +61,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     const token = request.token;
 
     if (_.isEmpty(token)) {
-        return response.status(400).send({error: "login required"});
+        return response.status(401).send({error: "login required"});
     }
 
     let userData;
@@ -69,7 +69,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     try {
         userData = jwt.decode(token, process.env.SECRET);
     } catch (e) {
-        return response.status(400).send({error: "login required"});
+        return response.status(401).send({error: "login required"});
     }
 
     const userId = _.get(userData, "id");
@@ -77,7 +77,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     const user = await User.findById(userId);
 
     if (_.isEmpty(user)) {
-        return response.status(400).send({error: "login required"});
+        return response.status(401).send({error: "login required"});
     }
 
     const blogId = request.params.id;
@@ -93,7 +93,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     const blogAuthorIsUser = blogUserId === user.id;
 
     if (! blogAuthorIsUser) {
-        return response.status(400).send({error: "authorization failed"});
+        return response.status(401).send({error: "authorization failed"});
     }
 
     // blog author is user - delete blog
