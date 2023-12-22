@@ -1,8 +1,13 @@
+const _ = require("lodash");
+
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const supertest = require("supertest");
+
 const app = require("../app");
 
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
 // noinspection DuplicatedCode
 const sourceMaterialBlogs = [
@@ -58,12 +63,68 @@ const sourceMaterialBlogs = [
 
 const api = supertest(app);
 
+const numberOfBlogs = async () => {
+    const numResult = await api
+        .get("/api/blogs")
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+    const blogs = numResult.body;
+
+    return blogs.length;
+}
+
+const rootUserData = async () => {
+    const saltRounds = 10;
+    const password = "password123";
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
+    // noinspection UnnecessaryLocalVariableJS
+    const data = {
+        username: "root",
+        name: "Root User",
+        password: passwordHash,
+    };
+
+    return data;
+}
+
+let token;
+let userId;
+
+const header = () => {
+    return `Bearer ${token}`;
+}
+
+beforeAll(async () => {
+    await User.deleteMany({});
+
+    const rootUser = new User(await rootUserData())
+    await rootUser.save();
+
+    userId = rootUser.id;
+
+    const correctUserName = "root";
+    const correctPassword = "password123";
+
+    const result = await api
+        .post("/api/login")
+        .send({username: correctUserName, password: correctPassword})
+        .expect(200);
+
+    token = _.get(result, "body.token");
+});
+
 beforeEach(async () => {
     // delete existing blogs, if any
     await Blog.deleteMany({});
 
     // create blog objects
-    const blogObjects = sourceMaterialBlogs.map((blogData) => new Blog(blogData));
+    const blogObjects = sourceMaterialBlogs.map((blogData) => {
+        blogData.user = userId;
+        return new Blog(blogData)
+    });
+
     const saves = blogObjects.map((blog) => blog.save());
 
     // execute promises
@@ -71,75 +132,87 @@ beforeEach(async () => {
 });
 
 describe('blogs', () => {
-   test('the correct number of blogs are returned as JSON', async () => {
-       const result = await api
-           .get("/api/blogs")
-           .expect(200)
-           .expect('Content-Type', /application\/json/)
+    test('the correct number of blogs are returned as JSON', async () => {
+        const result = await api
+            .get("/api/blogs")
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
 
-       const blogs = result.body;
-       const numBlogs = blogs.length;
+        const blogs = result.body;
+        const numBlogs = blogs.length;
 
-       expect(numBlogs).toBe(6);
-   });
+        expect(numBlogs).toBe(6);
+    });
 
-   test('a blog post contains the property id', async () => {
-       const result = await api
-           .get("/api/blogs")
-           .expect(200)
-           .expect('Content-Type', /application\/json/);
+    test('a blog post contains the property id', async () => {
+        const result = await api
+            .get("/api/blogs")
+            .expect(200)
+            .expect('Content-Type', /application\/json/);
 
-       const blogs = result.body;
-       const firstBlog = blogs[0];
+        const blogs = result.body;
+        const firstBlog = blogs[0];
 
-       expect(firstBlog.id).toBeDefined()
-   });
+        expect(firstBlog.id).toBeDefined()
+    });
 
-   test('posting a new blog works', async () => {
-       await Blog.deleteMany({});
+    test('posting a new blog with authorization succeeds', async () => {
+        await Blog.deleteMany({});
 
-       const blogToBePostedData = sourceMaterialBlogs[0];
+        const blogToBePostedData = sourceMaterialBlogs[0];
 
-       const result = await api
-           .post("/api/blogs")
-           .send(blogToBePostedData)
-           .expect(201)
-           .expect("Content-Type", /application\/json/);
+        const result = await api
+            .post("/api/blogs")
+            .set({authorization: header()})
+            .send(blogToBePostedData)
+            .expect(201)
+            .expect("Content-Type", /application\/json/);
 
-       const postedBlog = result.body;
+        const postedBlog = result.body;
 
-       expect(postedBlog.id).toBeDefined();
-       expect(postedBlog.likes).toBe(7);
+        expect(postedBlog.id).toBeDefined();
+        expect(postedBlog.likes).toBe(7);
 
-       const numResult = await api
-           .get("/api/blogs")
-           .expect(200)
-           .expect('Content-Type', /application\/json/)
+        const numBlogs = await numberOfBlogs();
 
-       const blogs = numResult.body;
-       const numBlogs = blogs.length;
+        expect(numBlogs).toBe(1);
+    });
 
-       expect(numBlogs).toBe(1);
-   });
+    test('posting a new blog without authorization fails', async () => {
+        await Blog.deleteMany({});
 
-   test('missing likes property defaults to 0', async () => {
-       await Blog.deleteMany({});
+        const blogToBePostedData = sourceMaterialBlogs[0];
 
-       const blogToBePostedData = sourceMaterialBlogs[0];
+        // noinspection JSUnusedLocalSymbols
+        const result = await api
+            .post("/api/blogs")
+            .send(blogToBePostedData)
+            .expect(401);
 
-       delete blogToBePostedData.likes;
+        const numBlogs = await numberOfBlogs();
 
-       const result = await api
-           .post("/api/blogs")
-           .send(blogToBePostedData)
-           .expect(201)
-           .expect("Content-Type", /application\/json/);
+        expect(numBlogs).toBe(0);
+    });
 
-       const postedBlog = result.body;
+    test('missing likes property defaults to 0', async () => {
+        await Blog.deleteMany({});
 
-       expect(postedBlog.id).toBeDefined();
-       expect(postedBlog.likes).toBe(0);
-   });
+        const blogToBePostedData = sourceMaterialBlogs[0];
+
+        delete blogToBePostedData.likes;
+
+        const result = await api
+            .post("/api/blogs")
+            .set({authorization: header()})
+            .send(blogToBePostedData)
+            .expect(201)
+            .expect("Content-Type", /application\/json/);
+
+        const postedBlog = result.body;
+
+        expect(postedBlog.id).toBeDefined();
+        expect(postedBlog.likes).toBe(0);
+    });
 
     test('posting an incomplete blog data returns correct error code', async () => {
         await Blog.deleteMany({});
@@ -152,6 +225,7 @@ describe('blogs', () => {
         // noinspection JSUnusedLocalSymbols
         const result1 = await api
             .post("/api/blogs")
+            .set({authorization: header()})
             .send(incompleteBlog1)
             .expect(400);
 
@@ -161,16 +235,11 @@ describe('blogs', () => {
         // noinspection JSUnusedLocalSymbols
         const result2 = await api
             .post("/api/blogs")
+            .set({authorization: header()})
             .send(incompleteBlog2)
             .expect(400);
 
-        const numResult = await api
-            .get("/api/blogs")
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
-
-        const blogs = numResult.body;
-        const numBlogs = blogs.length;
+        const numBlogs = await numberOfBlogs();
 
         expect(numBlogs).toBe(0);
     });
@@ -181,6 +250,7 @@ describe('blogs', () => {
         // noinspection JSUnusedLocalSymbols
         const result = await api
             .delete(`/api/blogs/${malformedId}`)
+            .set({authorization: header()})
             .expect(500);
     });
 
@@ -189,35 +259,12 @@ describe('blogs', () => {
 
         const result = await api
             .delete(`/api/blogs/${existingId}`)
+            .set({authorization: header()})
             .expect(200);
 
-        const numResult = await api
-            .get("/api/blogs")
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
-
-        const blogs = numResult.body;
-        const numBlogs = blogs.length;
+        const numBlogs = await numberOfBlogs();
 
         expect(numBlogs).toBe(sourceMaterialBlogs.length);
-    });
-
-    test('deleting a single blog succeeds when ID is found', async () => {
-        const existingId = "5a422a851b54a676234d17f7";
-
-        const result = await api
-            .delete(`/api/blogs/${existingId}`)
-            .expect(200);
-
-        const numResult = await api
-            .get("/api/blogs")
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
-
-        const blogs = numResult.body;
-        const numBlogs = blogs.length;
-
-        expect(numBlogs).toBe(sourceMaterialBlogs.length - 1);
     });
 
     test('deleting a single blog succeeds when ID is found', async () => {
@@ -226,15 +273,10 @@ describe('blogs', () => {
         // noinspection JSUnusedLocalSymbols
         const result = await api
             .delete(`/api/blogs/${existingId}`)
+            .set({authorization: header()})
             .expect(200);
 
-        const numResult = await api
-            .get("/api/blogs")
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
-
-        const blogs = numResult.body;
-        const numBlogs = blogs.length;
+        const numBlogs = await numberOfBlogs();
 
         expect(numBlogs).toBe(sourceMaterialBlogs.length - 1);
     });

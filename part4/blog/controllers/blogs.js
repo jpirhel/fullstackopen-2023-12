@@ -22,6 +22,8 @@ blogsRouter.post('/', async (request, response) => {
         return response.status(401).end();
     }
 
+    const blogData = request.body;
+
     const title = _.get(blogData, "title");
     const url = _.get(blogData, "url");
 
@@ -58,10 +60,17 @@ blogsRouter.delete('/:id', async (request, response) => {
     const blog = await Blog.findById(blogId);
 
     if (_.isEmpty(blog)) {
-        return response.status(400).send({error: "blog not found"});
+        // deleting a non-existing blog is ok
+        return response.status(200).end();
     }
 
-    const blogUserId = blog.user.toString();
+    let blogUserId;
+
+    try {
+        blogUserId = blog.user.toString();
+    } catch (e) {
+        return response.status(400).send({error: "blog user not found"});
+    }
 
     const blogAuthorIsUser = blogUserId === user.id;
 

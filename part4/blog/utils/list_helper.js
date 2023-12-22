@@ -65,8 +65,6 @@ const mostBlogs = (blogs) => {
     let mostBlogsCount = 0;
 
     _.forEach(counted, (v, k) => {
-        // console.log(`ZZZ v: ${v}, k: ${k}`);
-
         if (v > mostBlogsCount) {
             mostBlogsCount = v;
             mostBlogsAuthor = k;
