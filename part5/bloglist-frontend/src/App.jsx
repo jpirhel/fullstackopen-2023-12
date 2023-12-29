@@ -6,9 +6,36 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from "./services/login";
 
+const Message = ({message, messageType}) => {
+    if (_.isEmpty(message || _.isEmpty(messageType))) {
+        return null;
+    }
+
+    const color = messageType === "error" ? "red" : "green";
+
+    const style = {
+        borderStyle: "solid",
+        padding: 10,
+        borderWidth: 3,
+        borderRadius: 8,
+        borderColor: color,
+        backgroundColor: "#eeeeee",
+    };
+
+    return (
+        <div style={style}>{message}</div>
+    );
+}
+
 const BlogList = (props) => {
     const blogs = _.get(props, "blogs") || [];
+
     const user = _.get(props, "user");
+    const name = _.get(props, "user.name");
+
+    const title = _.get(props, "title") || "";
+    const author = _.get(props, "author") || "";
+    const url = _.get(props, "url") || "";
 
     const onSubmitLogout = _.get(props, "onSubmitLogout");
     const onSubmitCreate = _.get(props, "onSubmitCreate");
@@ -19,9 +46,12 @@ const BlogList = (props) => {
 
     return (
         <>
-            {user.name} logged in
+            {name} logged in
             <LogoutForm onSubmit={onSubmitLogout}/>
             {user && <CreateForm
+                title={title}
+                author={author}
+                url={url}
                 onSubmit={onSubmitCreate}
                 onChangeTitle={onChangeTitle}
                 onChangeAuthor={onChangeAuthor}
@@ -44,7 +74,6 @@ const LoginForm = ({
                    }) => {
     return (
         <form onSubmit={onSubmit}>
-            <h2>log in to application</h2>
             <div>
                 <label htmlFor="Username">Username</label><br/>
                 <input
@@ -75,19 +104,30 @@ const LogoutForm = ({onSubmit}) => {
     )
 }
 
-const CreateForm = ({onSubmit, onChangeTitle, onChangeAuthor, onChangeUrl}) => {
+const CreateForm = ({
+                        title,
+                        author,
+                        url,
+                        onSubmit,
+                        onChangeTitle,
+                        onChangeAuthor,
+                        onChangeUrl,
+                    }) => {
     return (
         <div>
             <h2>create new</h2>
             <form>
-                title: <input type="text" name="Title" onChange={({target}) => onChangeTitle(target.value)}/><br/>
-                author: <input type="text" name="Author" onChange={({target}) =>onChangeAuthor(target.value)}/><br/>
-                url: <input type="text" name="Url" onChange={({target}) => onChangeUrl(target.value)}/>
+                title: <input type="text" name="Title" value={title}
+                              onChange={({target}) => onChangeTitle(target.value)}/><br/>
+                author: <input type="text" name="Author" value={author}
+                               onChange={({target}) => onChangeAuthor(target.value)}/><br/>
+                url: <input type="text" name="Url" value={url} onChange={({target}) => onChangeUrl(target.value)}/>
             </form>
             <button onClick={onSubmit}>create</button>
         </div>
     );
 }
+
 const App = () => {
     const [ready, setReady] = useState(false);
 
@@ -102,6 +142,9 @@ const App = () => {
     const [url, setUrl] = useState("");
 
     const [refreshBlogs, setRefreshBlogs] = useState(0);
+
+    const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState("");
 
     // NOTE changed to depend on user, so blogs will be fetched after the user logs in
     useEffect(() => {
@@ -122,6 +165,12 @@ const App = () => {
 
     const login = async (username, password) => {
         const result = await loginService.login(username, password);
+
+        if (_.isEmpty(result)) {
+            showMessage("wrong username or password", "error");
+            return;
+        }
+
         setUser(result);
         window.localStorage.setItem("user", JSON.stringify(result));
     }
@@ -129,6 +178,17 @@ const App = () => {
     const logout = () => {
         window.localStorage.removeItem("user");
         setUser(null);
+    }
+
+    const showMessage = (message, messageType) => {
+        setMessage(message);
+        setMessageType(messageType);
+
+        setTimeout(() => {
+            // clear message
+            setMessage("");
+            setMessageType("");
+        }, 5000);
     }
 
     const getAllBlogs = () => {
@@ -179,17 +239,32 @@ const App = () => {
     const onSubmitCreate = async (data) => {
         const result = await blogService.postNew(user, title, author, url);
 
+        const message = `a new blog ${title} by ${author} added`;
+
+        setAuthor("");
+        setTitle("");
+        setUrl("");
+
         setRefreshBlogs(refreshBlogs + 1);
+
+        showMessage(message, "success");
     };
 
     const renderLoginForm = !user && ready;
 
+    const renderUser = ! _.isEmpty(user);
+
     return (
         <div>
-            {user && <h2>blogs</h2>}
-            {user && <BlogList
+            {renderUser || <h2>log in to application</h2>}
+            <Message message={message} messageType={messageType}/>
+            {renderUser && <h2>blogs</h2>}
+            {renderUser && <BlogList
                 blogs={blogs}
                 user={user}
+                title={title}
+                author={author}
+                url={url}
                 onSubmitLogout={onSubmitLogout}
                 onSubmitCreate={onSubmitCreate}
                 onChangeTitle={onChangeTitle}
