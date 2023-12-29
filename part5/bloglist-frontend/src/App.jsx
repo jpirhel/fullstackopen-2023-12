@@ -8,10 +8,14 @@ import loginService from "./services/login";
 
 const BlogList = (props) => {
     const blogs = _.get(props, "blogs") || [];
+    const user = _.get(props, "user");
+    const onSubmitLogout = _.get(props, "onSubmitLogout");
 
     return (
         <>
-            <h2>blogs</h2>
+            {user.name} logged in
+            <LogoutForm onSubmit={onSubmitLogout}/>
+            <div>&nbsp;</div>
             {blogs.map(blog =>
                 <Blog key={blog.id} blog={blog}/>
             )}
@@ -55,10 +59,7 @@ const LoginForm = ({
 
 const LogoutForm = ({onSubmit}) => {
     return (
-        <div>
-            <hr/>
-            <button type="button" onClick={onSubmit}>logout</button>
-        </div>
+        <button type="button" onClick={onSubmit}>logout</button>
     )
 }
 
@@ -76,7 +77,9 @@ const App = () => {
     }, [user])
 
     useEffect(() => {
-        const storedUser = window.localStorage.getItem("user");
+        const storedUserJSON = window.localStorage.getItem("user");
+
+        const storedUser = JSON.parse(storedUserJSON);
 
         if (!_.isEmpty(storedUser)) {
             setUser(storedUser);
@@ -88,7 +91,7 @@ const App = () => {
     const login = async (username, password) => {
         const result = await loginService.login(username, password);
         setUser(result);
-        window.localStorage.setItem("user", result);
+        window.localStorage.setItem("user", JSON.stringify(result));
     }
 
     const logout = () => {
@@ -130,21 +133,20 @@ const App = () => {
         setPassword(data);
     };
 
-    const renderLoginForm = ! user && ready;
+    const renderLoginForm = !user && ready;
 
     return (
         <div>
-            {user && <BlogList blogs={blogs}/>}
+            {user && <h2>blogs</h2>}
+            {user && <BlogList blogs={blogs} user={user} onSubmitLogout={onSubmitLogout}/>}
             {renderLoginForm &&
                 <LoginForm
                     username={username || ""}
                     onSubmit={onSubmitLogin}
                     onChangeUsername={onChangeUsername}
                     onChangePassword={onChangePassword}/>}
-            {user && <LogoutForm onSubmit={onSubmitLogout}/>}
-</div>
-)
-    ;
+        </div>
+    );
 }
 
 export default App;
