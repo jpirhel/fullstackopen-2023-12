@@ -9,38 +9,10 @@ import {
 } from 'react'
 
 import Blog from './components/Blog'
+import Togglable from './components/Togglable'
+
 import blogService from './services/blogs'
 import loginService from "./services/login";
-
-// Togglable component copied from https://fullstackopen.com/en/part5/props_children_and_proptypes
-const Togglable = forwardRef((props, refs) => {
-    const [visible, setVisible] = useState(false);
-
-    const hideWhenVisible = { display: visible ? 'none' : '' };
-    const showWhenVisible = { display: visible ? '' : 'none' };
-
-    const toggleVisibility = () => {
-        setVisible(!visible)
-    };
-
-    useImperativeHandle(refs, () => {
-        return {
-            toggleVisibility
-        };
-    });
-
-    return (
-        <div>
-            <div style={hideWhenVisible}>
-                <button onClick={toggleVisibility}>{props.buttonLabel}</button>
-            </div>
-            <div style={showWhenVisible}>
-                {props.children}
-                <button onClick={toggleVisibility}>cancel</button>
-            </div>
-        </div>
-    );
-});
 
 const Message = ({message, messageType}) => {
     if (_.isEmpty(message || _.isEmpty(messageType))) {
