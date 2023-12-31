@@ -123,6 +123,9 @@ const CreateForm = ({
                         onChangeAuthor,
                         onChangeUrl,
                     }) => {
+    // comment to mark assigment 5.6 - CreateForm is a separate component
+    // using handlers and values as props
+
     const style = {
         borderStyle: "solid",
         borderWidth: 1,
