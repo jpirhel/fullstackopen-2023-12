@@ -78,6 +78,9 @@ const App = () => {
         }, 5000);
     }
 
+    const refresh = () => {
+        setRefreshBlogs(refreshBlogs + 1);
+    };
     const getAllBlogs = () => {
         async function fetchData() {
 
@@ -132,7 +135,7 @@ const App = () => {
         setTitle("");
         setUrl("");
 
-        setRefreshBlogs(refreshBlogs + 1);
+        refresh();
 
         showMessage(message, "success");
 
@@ -182,6 +185,7 @@ const App = () => {
                 onChangeTitle={onChangeTitle}
                 onChangeAuthor={onChangeAuthor}
                 onChangeUrl={onChangeUrl}
+                refresh={refresh}
             />}
             {renderLoginForm &&
                 <LoginForm
