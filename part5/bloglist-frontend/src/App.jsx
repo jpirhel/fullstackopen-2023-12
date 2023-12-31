@@ -1,129 +1,17 @@
 import _ from "lodash";
 
-import {
-    useRef,
-    useState,
-    useEffect,
-} from 'react'
+import {useRef, useState, useEffect} from 'react'
 
-import Blog from './components/Blog'
 import Togglable from './components/Togglable'
+
+import Message from "./components/Message";
+import BlogList from "./components/BlogList";
+import LoginForm from "./components/LoginForm";
+import LogoutForm from "./components/LogoutForm";
+import CreateForm from "./components/CreateForm";
 
 import blogService from './services/blogs'
 import loginService from "./services/login";
-
-const Message = ({message, messageType}) => {
-    if (_.isEmpty(message || _.isEmpty(messageType))) {
-        return null;
-    }
-
-    const color = messageType === "error" ? "red" : "green";
-
-    const style = {
-        borderStyle: "solid",
-        padding: 10,
-        borderWidth: 3,
-        borderRadius: 8,
-        borderColor: color,
-        backgroundColor: "#eeeeee",
-    };
-
-    return (
-        <div style={style}>{message}</div>
-    );
-}
-
-const BlogList = (props) => {
-    const blogs = _.get(props, "blogs") || [];
-
-    return (
-        <>
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog}/>
-            )}
-        </>
-    );
-}
-
-const LoginForm = ({
-                       username,
-                       password,
-                       onSubmit,
-                       onChangeUsername,
-                       onChangePassword
-                   }) => {
-    return (
-        <form onSubmit={onSubmit}>
-            <div>
-                <label htmlFor="Username">Username</label><br/>
-                <input
-                    type="text"
-                    value={username}
-                    name="Username"
-                    onChange={({target}) => onChangeUsername(target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="Password">Password</label><br/>
-                <input
-                    type="password"
-                    value={password}
-                    name="Password"
-                    onChange={({target}) => onChangePassword(target.value)}
-                />
-            </div>
-            <hr/>
-            <button type="submit">login</button>
-        </form>
-    )
-}
-
-const LogoutForm = ({onSubmit}) => {
-    return (
-        <button type="button" onClick={onSubmit}>logout</button>
-    )
-}
-
-const CreateForm = ({
-                        title,
-                        author,
-                        url,
-                        onSubmit,
-                        onChangeTitle,
-                        onChangeAuthor,
-                        onChangeUrl,
-                    }) => {
-    // comment to mark assigment 5.6 - CreateForm is a separate component
-    // using handlers and values as props
-
-    const style = {
-        borderStyle: "solid",
-        borderWidth: 1,
-        borderColor: "gray",
-        backgroundColor: "#eee",
-        paddingLeft: 10,
-        paddingBottom: 10,
-        marginBottom: 10,
-    };
-
-    const headerStyle = {
-        marginTop: 0,
-    };
-
-    return (
-        <div style={style}>
-            <h2 style={headerStyle}>create new</h2>
-            <form>
-                title: <input type="text" name="Title" value={title}
-                              onChange={({target}) => onChangeTitle(target.value)}/><br/>
-                author: <input type="text" name="Author" value={author}
-                               onChange={({target}) => onChangeAuthor(target.value)}/><br/>
-                url: <input type="text" name="Url" value={url} onChange={({target}) => onChangeUrl(target.value)}/>
-            </form>
-            <button onClick={onSubmit}>create</button>
-        </div>
-    );
-}
 
 const App = () => {
     const [ready, setReady] = useState(false);
