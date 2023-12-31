@@ -1,10 +1,46 @@
 import _ from "lodash";
 
-import {useState, useEffect} from 'react'
+import {
+    useRef,
+    useState,
+    useEffect,
+    forwardRef,
+    useImperativeHandle,
+} from 'react'
 
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from "./services/login";
+
+// Togglable component copied from https://fullstackopen.com/en/part5/props_children_and_proptypes
+const Togglable = forwardRef((props, refs) => {
+    const [visible, setVisible] = useState(false);
+
+    const hideWhenVisible = { display: visible ? 'none' : '' };
+    const showWhenVisible = { display: visible ? '' : 'none' };
+
+    const toggleVisibility = () => {
+        setVisible(!visible)
+    };
+
+    useImperativeHandle(refs, () => {
+        return {
+            toggleVisibility
+        };
+    });
+
+    return (
+        <div>
+            <div style={hideWhenVisible}>
+                <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+            </div>
+            <div style={showWhenVisible}>
+                {props.children}
+                <button onClick={toggleVisibility}>cancel</button>
+            </div>
+        </div>
+    );
+});
 
 const Message = ({message, messageType}) => {
     if (_.isEmpty(message || _.isEmpty(messageType))) {
@@ -30,34 +66,8 @@ const Message = ({message, messageType}) => {
 const BlogList = (props) => {
     const blogs = _.get(props, "blogs") || [];
 
-    const user = _.get(props, "user");
-    const name = _.get(props, "user.name");
-
-    const title = _.get(props, "title") || "";
-    const author = _.get(props, "author") || "";
-    const url = _.get(props, "url") || "";
-
-    const onSubmitLogout = _.get(props, "onSubmitLogout");
-    const onSubmitCreate = _.get(props, "onSubmitCreate");
-
-    const onChangeTitle = _.get(props, "onChangeTitle");
-    const onChangeAuthor = _.get(props, "onChangeAuthor");
-    const onChangeUrl = _.get(props, "onChangeUrl");
-
     return (
         <>
-            {name} logged in
-            <LogoutForm onSubmit={onSubmitLogout}/>
-            {user && <CreateForm
-                title={title}
-                author={author}
-                url={url}
-                onSubmit={onSubmitCreate}
-                onChangeTitle={onChangeTitle}
-                onChangeAuthor={onChangeAuthor}
-                onChangeUrl={onChangeUrl}
-            />}
-            <div>&nbsp;</div>
             {blogs.map(blog =>
                 <Blog key={blog.id} blog={blog}/>
             )}
@@ -113,9 +123,23 @@ const CreateForm = ({
                         onChangeAuthor,
                         onChangeUrl,
                     }) => {
+    const style = {
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderColor: "gray",
+        backgroundColor: "#eee",
+        paddingLeft: 10,
+        paddingBottom: 10,
+        marginBottom: 10,
+    };
+
+    const headerStyle = {
+        marginTop: 0,
+    };
+
     return (
-        <div>
-            <h2>create new</h2>
+        <div style={style}>
+            <h2 style={headerStyle}>create new</h2>
             <form>
                 title: <input type="text" name="Title" value={title}
                               onChange={({target}) => onChangeTitle(target.value)}/><br/>
@@ -145,6 +169,8 @@ const App = () => {
 
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
+
+    const togglableCreateFormRef = useRef();
 
     // NOTE changed to depend on user, so blogs will be fetched after the user logs in
     useEffect(() => {
@@ -248,17 +274,42 @@ const App = () => {
         setRefreshBlogs(refreshBlogs + 1);
 
         showMessage(message, "success");
+
+        // noinspection JSUnresolvedReference
+        togglableCreateFormRef.current.toggleVisibility();
     };
 
     const renderLoginForm = !user && ready;
 
     const renderUser = ! _.isEmpty(user);
 
+    const togglableCreateFormStyle = {marginTop: 10};
+
+    const togglableCreateForm = (
+        <div style={togglableCreateFormStyle}>
+            <Togglable buttonLabel="new note" ref={togglableCreateFormRef}>
+                <CreateForm
+                    title={title}
+                    author={author}
+                    url={url}
+                    onSubmit={onSubmitCreate}
+                    onChangeTitle={onChangeTitle}
+                    onChangeAuthor={onChangeAuthor}
+                    onChangeUrl={onChangeUrl}
+                />
+            </Togglable>
+        </div>
+    );
+
     return (
         <div>
             {renderUser || <h2>log in to application</h2>}
             <Message message={message} messageType={messageType}/>
             {renderUser && <h2>blogs</h2>}
+            {renderUser && <>{user.name} logged in</>}
+            <LogoutForm onSubmit={onSubmitLogout}/>
+            {user && togglableCreateForm}
+            <div>&nbsp;</div>
             {renderUser && <BlogList
                 blogs={blogs}
                 user={user}
