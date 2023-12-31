@@ -22,10 +22,6 @@ const App = () => {
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
 
-    const [title, setTitle] = useState("");
-    const [author, setAuthor] = useState("");
-    const [url, setUrl] = useState("");
-
     const [refreshBlogs, setRefreshBlogs] = useState(0);
 
     const [message, setMessage] = useState("");
@@ -115,25 +111,10 @@ const App = () => {
         setPassword(data);
     };
 
-    const onChangeTitle = (data) => {
-        setTitle(data);
-    }
-
-    const onChangeAuthor = (data) => {
-        setAuthor(data);
-    }
-
-    const onChangeUrl = (data) => {
-        setUrl(data);
-    }
-    const onSubmitCreate = async (data) => {
+    const onSubmitCreate = async (title, author, url) => {
         const result = await blogService.postNew(user, title, author, url);
 
         const message = `a new blog ${title} by ${author} added`;
-
-        setAuthor("");
-        setTitle("");
-        setUrl("");
 
         refresh();
 
@@ -172,15 +153,7 @@ const App = () => {
     const togglableCreateForm = (
         <div style={togglableCreateFormStyle}>
             <Togglable buttonLabel="new note" ref={togglableCreateFormRef}>
-                <CreateForm
-                    title={title}
-                    author={author}
-                    url={url}
-                    onSubmit={onSubmitCreate}
-                    onChangeTitle={onChangeTitle}
-                    onChangeAuthor={onChangeAuthor}
-                    onChangeUrl={onChangeUrl}
-                />
+                <CreateForm onSubmit={onSubmitCreate}/>
             </Togglable>
         </div>
     );
@@ -197,14 +170,8 @@ const App = () => {
             {renderUser && <BlogList
                 blogs={blogs}
                 user={user}
-                title={title}
-                author={author}
-                url={url}
                 onSubmitLogout={onSubmitLogout}
                 onSubmitCreate={onSubmitCreate}
-                onChangeTitle={onChangeTitle}
-                onChangeAuthor={onChangeAuthor}
-                onChangeUrl={onChangeUrl}
                 onHandleLike={onHandleLike}
                 onHandleDelete={onHandleDelete}
             />}

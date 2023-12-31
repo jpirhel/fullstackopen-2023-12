@@ -1,14 +1,9 @@
-const CreateForm = ({
-                        title,
-                        author,
-                        url,
-                        onSubmit,
-                        onChangeTitle,
-                        onChangeAuthor,
-                        onChangeUrl,
-                    }) => {
-    // comment to mark assigment 5.6 - CreateForm is a separate component
-    // using handlers and values as props
+import {useState} from "react";
+
+const CreateForm = ({onSubmit}) => {
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState("");
+    const [url, setUrl] = useState("");
 
     const style = {
         borderStyle: "solid",
@@ -24,17 +19,22 @@ const CreateForm = ({
         marginTop: 0,
     };
 
+    const onSubmitForm = () => {
+        onSubmit(title, author, url);
+        document.getElementById("createForm").reset();
+    };
+
     return (
         <div style={style}>
             <h2 style={headerStyle}>create new</h2>
-            <form>
-                title: <input type="text" name="Title" value={title}
-                              onChange={({target}) => onChangeTitle(target.value)}/><br/>
-                author: <input type="text" name="Author" value={author}
-                               onChange={({target}) => onChangeAuthor(target.value)}/><br/>
-                url: <input type="text" name="Url" value={url} onChange={({target}) => onChangeUrl(target.value)}/>
+            <form id="createForm" data-testid="createform" onSubmit={onSubmitForm}>
+                title: <input aria-label="Title" type="text" name="Title" value={title}
+                              onChange={({target}) => setTitle(target.value)}/><br/>
+                author: <input aria-label="Author" type="text" name="Author" value={author}
+                               onChange={({target}) => setAuthor(target.value)}/><br/>
+                url: <input aria-label="Url" type="text" name="Url" value={url} onChange={({target}) => setUrl(target.value)}/>
+                <button type="submit" aria-label="create" data-testid="createbutton">create</button>
             </form>
-            <button onClick={onSubmit}>create</button>
         </div>
     );
 }

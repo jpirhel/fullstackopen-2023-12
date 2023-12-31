@@ -9,8 +9,6 @@ import userEvent from "@testing-library/user-event";
 
 import Blog from "./Blog";
 
-const refresh = _.noop;
-
 const user = {}; // empty
 
 const blogData = {
