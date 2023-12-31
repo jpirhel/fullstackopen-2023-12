@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import axios from 'axios'
+import axios from "axios";
 
 const serverUrl = (path) => {
     // const baseUrl = "http://localhost:3003";
