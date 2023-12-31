@@ -143,6 +143,26 @@ const App = () => {
         togglableCreateFormRef.current.toggleVisibility();
     };
 
+    const onHandleLike = async (blog) => {
+        try {
+            await blogService.addLike(user, blog);
+
+            refresh();
+        } catch (e) {
+            console.log("Failed to add like, error:", e);
+        }
+    };
+
+    const onHandleDelete = async (blog) => {
+        const message = `Remove blog ${blog.title} by ${blog.user.name}?`;
+
+        if (window.confirm(message)) {
+            await blogService.deleteBlog(user, blog);
+
+            refresh();
+        }
+    };
+
     const renderLoginForm = !user && ready;
 
     const renderUser = ! _.isEmpty(user);
@@ -185,7 +205,8 @@ const App = () => {
                 onChangeTitle={onChangeTitle}
                 onChangeAuthor={onChangeAuthor}
                 onChangeUrl={onChangeUrl}
-                refresh={refresh}
+                onHandleLike={onHandleLike}
+                onHandleDelete={onHandleDelete}
             />}
             {renderLoginForm &&
                 <LoginForm

@@ -65,8 +65,6 @@ const addLike = async (user, blog) => {
     // add a like
     newBlog.likes = newBlog.likes + 1;
 
-    console.log("blogService.addLike newBlog:", newBlog);
-
     const headers = defaultHeaders(user);
 
     const data = newBlog;

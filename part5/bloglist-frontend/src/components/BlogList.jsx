@@ -13,7 +13,9 @@ const BlogList = (props) => {
                 key={blog.id}
                 blog={blog}
                 user={props.user}
-                refresh={props.refresh}/>
+                onHandleLike={props.onHandleLike}
+                onHandleDelete={props.onHandleDelete}
+                />
             )}
         </>
     );

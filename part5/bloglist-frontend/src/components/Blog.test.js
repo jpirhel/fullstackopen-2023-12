@@ -26,7 +26,7 @@ const blogData = {
 
 describe("<Blog/>", () => {
     test("Blog renders title and author, but does not render URL or likes", async () => {
-        render(<Blog blog={blogData} user={user} refresh={refresh}/>);
+        render(<Blog blog={blogData} user={user} onHandleLike={_.noop} onHandleDelete={_.noop}/>);
 
         // blog title is visible
 
@@ -54,7 +54,7 @@ describe("<Blog/>", () => {
     });
 
     test("When show clicked, URL and likes are visible", async () => {
-        render(<Blog blog={blogData} user={user} refresh={refresh}/>);
+        render(<Blog blog={blogData} user={user} onHandleLike={_.noop} onHandleDelete={_.noop}/>);
 
         const testUser = userEvent.setup();
 
@@ -73,5 +73,28 @@ describe("<Blog/>", () => {
         const likesElement = screen.getByText("100", {exact: false});
 
         expect(likesElement).toBeVisible();
+    });
+
+    test("When like button is clicked twice, the event handler is called twice", async () => {
+        const onHandleLike = jest.fn();
+
+        render(<Blog blog={blogData} user={user} onHandleLike={onHandleLike} onHandleDelete={_.noop}/>);
+
+        const testUser = userEvent.setup();
+
+        // click the view button
+
+        const viewButton = screen.getByText("view");
+
+        await testUser.click(viewButton);
+
+        const likeButton = screen.getByText("like");
+
+        // click the like button twice
+
+        await testUser.click(likeButton);
+        await testUser.click(likeButton);
+
+        expect(onHandleLike.mock.calls).toHaveLength(2);
     });
 });
